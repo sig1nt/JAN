@@ -22,7 +22,12 @@ func main() {
 		ID:    *id,
 		Token: *token,
 	}
-	if err := webhook.Execute("hello from Go!"); err != nil {
+
+	webhookBody := discord.WebhookBody{
+		Content: "hello from Go (with structs)!",
+	}
+
+	if err := webhook.Execute(webhookBody); err != nil {
 		fmt.Fprintf(os.Stderr, "execute failed: %v", err)
 		os.Exit(2)
 	}

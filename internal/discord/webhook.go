@@ -16,6 +16,12 @@ type Webhook struct {
 	Token string
 }
 
+// https://discord.com/developers/docs/resources/webhook#execute-webhook-jsonform-params
+// Currently only use a subset that we're actually interested in sending
+type WebhookBody struct {
+	Content string `json:"content"`
+}
+
 // URL returns the fully-formatted webhook URL.
 func (w *Webhook) URL() string {
 	return fmt.Sprintf("https://discord.com/api/webhooks/%s/%s", w.ID, w.Token)
@@ -23,14 +29,12 @@ func (w *Webhook) URL() string {
 
 // Excute implements the Exectute verb on a webhook.
 // https://discord.com/developers/docs/resources/webhook#execute-webhook
-func (w *Webhook) Execute(msg string) error {
-	body, err := json.Marshal(map[string]string{
-		"content": msg,
-	})
+func (w *Webhook) Execute(body WebhookBody) error {
+	bodySer, err := json.Marshal(body)
 	if err != nil {
 		return err
 	}
-	resp, err := http.Post(w.URL(), "application/json", bytes.NewBuffer(body))
+	resp, err := http.Post(w.URL(), "application/json", bytes.NewBuffer(bodySer))
 	if err != nil {
 		return err
 	}
